@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>수익 시뮬레이터 리포트</title>
+
+  <!-- XLSX -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <!-- PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#101828;
+      --muted:#667085;
+      --line:#e7e9ef;
+      --soft:#f2f4f7;
+
+      /* BRAND */
+      --brand:#111827;
+      --brand2:#334155;
+      --accent:#111827;     /* 포인트 컬러 */
+      --accentSoft:#eef2ff; /* 포인트 배경 */
+      --good:#027a48;
+      --bad:#b42318;
+      --warn:#b54708;
+
+      --r:18px;
+      --shadow: 0 12px 30px rgba(16,24,40,.06);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans KR",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{max-width:1100px; margin:24px auto; padding:0 16px;}
+    .topbar{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      margin-bottom:14px;
+    }
+    .brand{
+      display:flex; gap:12px; align-items:center;
+    }
+    .logo{
+      width:42px; height:42px; border-radius:14px;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow: var(--shadow);
+    }
+    .brand h1{font-size:16px; margin:0; letter-spacing:-.2px;}
+    .brand p{margin:2px 0 0; font-size:12px; color:var(--muted);}
+
+    .actions{display:flex; gap:10px; flex-wrap:wrap;}
+    button{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:14px;
+      padding:10px 12px;
+      font-weight:800;
+      cursor:pointer;
+      color:var(--text);
+    }
+    button.primary{
+      background:var(--accent);
+      color:#fff;
+      border-color:var(--accent);
+    }
+
+    .grid{display:grid; gap:14px;}
+    .grid-2{grid-template-columns: 1fr 1.25fr;}
+    @media (max-width: 980px){ .grid-2{grid-template-columns:1fr;} }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      padding:16px;
+      box-shadow: var(--shadow);
+    }
+    .card h2{margin:0 0 10px; font-size:15px; letter-spacing:-.2px;}
+    .sub{margin:0 0 12px; color:var(--muted); font-size:12px; line-height:1.5;}
+
+    .sectionTitle{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; margin-bottom:10px;
+    }
+    .pill{
+      font-size:11px; font-weight:900;
+      padding:6px 10px; border-radius:999px;
+      background:var(--soft); border:1px solid var(--line);
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
+    .formGrid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+    @media (max-width: 640px){ .formGrid{grid-template-columns:1fr;} }
+    label{display:block; font-size:12px; color:#344054; margin-bottom:6px; font-weight:800;}
+    input{
+      width:100%;
+      padding:11px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      outline:none;
+      font-size:14px;
+      background:#fff;
+    }
+    input.hi{background:#fff7cc; border-color:#f1d470;}
+    .help{font-size:11px; color:var(--muted); margin-top:6px;}
+
+    /* Report */
+    #report{
+      background:#fff;
+      border-radius:var(--r);
+      border:1px solid var(--line);
+      overflow:hidden;
+    }
+
+    .cover{
+      padding:18px 18px 14px;
+      background: linear-gradient(135deg, #0b1220, #111827, #1f2937);
+      color:#fff;
+      position:relative;
+    }
+    .coverRow{display:flex; align-items:flex-start; justify-content:space-between; gap:12px;}
+    .cover h3{margin:0; font-size:18px; letter-spacing:-.3px;}
+    .cover .meta{margin-top:6px; color: rgba(255,255,255,.78); font-size:12px; line-height:1.5;}
+    .cover .stamp{
+      text-align:right;
+      font-size:11px;
+      color: rgba(255,255,255,.75);
+    }
+    .cover .stamp .big{
+      display:block; font-size:14px; font-weight:900; color:#fff; margin-top:4px;
+    }
+    .cover .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      margin-top:12px;
+      padding:8px 10px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:999px;
+      font-size:12px;
+    }
+    .dot{width:10px; height:10px; border-radius:999px; background:#fff;}
+
+    .reportBody{padding:16px;}
+    .kpis{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+    @media (max-width: 840px){ .kpis{grid-template-columns:1fr;} }
+    .kpi{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+      background: linear-gradient(180deg, #ffffff, #fbfbfd);
+    }
+    .kpi .t{font-size:12px; color:var(--muted); font-weight:800;}
+    .kpi .v{font-size:22px; margin-top:8px; font-weight:950; letter-spacing:-.4px;}
+    .kpi .s{font-size:11px; margin-top:6px; color:var(--muted); line-height:1.45;}
+    .kpi.good .v{color:var(--good);}
+    .kpi.warn .v{color:var(--warn);}
+
+    .twoCols{display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:12px;}
+    @media (max-width: 840px){ .twoCols{grid-template-columns:1fr;} }
+
+    .box{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+      background:#fff;
+    }
+    .box h4{margin:0 0 8px; font-size:13px;}
+    .kv{
+      display:grid; grid-template-columns: 1fr auto; gap:8px 12px;
+      font-size:12px;
+    }
+    .kv .k{color:var(--muted); font-weight:800;}
+    .kv .v{font-weight:900;}
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:12px;
+      font-size:12px;
+    }
+    th,td{
+      padding:10px 8px;
+      border-bottom:1px solid var(--line);
+      text-align:right;
+      vertical-align:middle;
+    }
+    th{
+      text-align:right;
+      background:#fafbff;
+      font-weight:950;
+      color:#344054;
+    }
+    th:first-child, td:first-child{ text-align:left; }
+    .tag{
+      display:inline-block;
+      padding:4px 8px;
+      border-radius:999px;
+      background:var(--soft);
+      border:1px solid var(--line);
+      font-size:11px;
+      font-weight:900;
+      color:#475467;
+    }
+
+    .insight{
+      margin-top:12px;
+      padding:12px;
+      border-radius:16px;
+      border:1px dashed #cbd5e1;
+      background: #f8fafc;
+      color:#334155;
+      font-size:12px;
+      line-height:1.6;
+    }
+    .insight b{font-weight:950;}
+
+    .footer{
+      margin-top:14px;
+      padding-top:12px;
+      border-top:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    /* Print/PDF hygiene */
+    .noPrint{display:block;}
+    @media print{
+      body{background:#fff;}
+      .wrap{max-width:none; margin:0; padding:0;}
+      .topbar, .noPrint{display:none !important;}
+      .card{box-shadow:none; border:none;}
+      #report{border:none;}
+      .reportBody{padding:12mm;}
+      .cover{padding:12mm; border-radius:0;}
+      .pageBreak{break-before: page;}
+    }
+
+    /* Make report look like A4 */
+    .a4Hint{
+      font-size:11px;
+      color:var(--muted);
+      margin-top:10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar noPrint">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1 id="brandName">SIM Revenue Report</h1>
+          <p id="brandSub">입력값 기반 자동 리포트 · PDF/엑셀 다운로드</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="btnPdf" class="primary">PDF 다운로드</button>
+        <button id="btnXlsx">엑셀 다운로드</button>
+        <button id="btnPrint">인쇄</button>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <!-- Inputs -->
+      <div class="card">
+        <div class="sectionTitle">
+          <h2>입력</h2>
+          <span class="pill">노란 칸만 수정</span>
+        </div>
+        <p class="sub">월 검사 건수와 단가 가정값을 입력하면 보고서가 즉시 업데이트됩니다.</p>
+
+        <div class="box" style="margin-bottom:12px;">
+          <h4>보고서 정보</h4>
+          <div class="formGrid">
+            <div>
+              <label>리포트 제목</label>
+              <input id="reportTitle" class="hi" type="text" value="병원 수익 시뮬레이션 리포트" />
+              <div class="help">PDF 커버에 표시됩니다.</div>
+            </div>
+            <div>
+              <label>기관/프로젝트명</label>
+              <input id="reportOrg" class="hi" type="text" value="OO병원 · AiTiA" />
+              <div class="help">예: 세란병원 검진센터</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="sectionTitle" style="margin:0 0 8px;">
+            <h4 style="margin:0;">외래</h4>
+            <span class="tag">단위: 원</span>
+          </div>
+          <div class="formGrid">
+            <div>
+              <label>월 검사 건수</label>
+              <input id="opCount" class="hi" type="number" min="0" value="100" />
+              <div class="help">예: 100, 1000, 2000</div>
+            </div>
+            <div>
+              <label>환자 청구 단가</label>
+              <input id="opPrice" class="hi" type="number" min="0" value="9300" />
+              <div class="help">기본값: 9,300원</div>
+            </div>
+            <div>
+              <label>구매 단가</label>
+              <input id="opCost" class="hi" type="number" min="0" value="6000" />
+              <div class="help">기본값: 6,000원</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:12px;"></div>
+
+        <div class="box">
+          <div class="sectionTitle" style="margin:0 0 8px;">
+            <h4 style="margin:0;">검진센터</h4>
+            <span class="tag">단위: 원</span>
+          </div>
+          <div class="formGrid">
+            <div>
+              <label>월 검사 건수</label>
+              <input id="scCount" class="hi" type="number" min="0" value="1000" />
+              <div class="help">예: 1000</div>
+            </div>
+            <div>
+              <label>검진 청구 단가</label>
+              <input id="scPrice" class="hi" type="number" min="0" value="30000" />
+              <div class="help">기본값: 30,000원</div>
+            </div>
+            <div>
+              <label>구매 단가</label>
+              <input id="scCost" class="hi" type="number" min="0" value="12000" />
+              <div class="help">기본값: 12,000원</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="a4Hint">PDF는 보고서 영역만 A4 기준으로 저장됩니다. (입력 폼은 PDF에 포함되지 않음)</div>
+      </div>
+
+      <!-- Report -->
+      <div id="report" class="card" style="padding:0;">
+        <!-- Cover -->
+        <div class="cover">
+          <div class="coverRow">
+            <div>
+              <h3 id="coverTitle">병원 수익 시뮬레이션 리포트</h3>
+              <div class="meta" id="coverOrg">OO병원 · AiTiA</div>
+              <div class="badge"><span class="dot"></span><span id="coverPeriod">월 건수 기준 · 연간 환산 포함</span></div>
+            </div>
+            <div class="stamp">
+              Generated
+              <span class="big" id="coverDate">YYYY-MM-DD</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="reportBody" id="reportBody">
+          <!-- KPIs -->
+          <div class="kpis" id="kpis"></div>
+
+          <!-- Summary boxes -->
+          <div class="twoCols">
+            <div class="box">
+              <h4>입력값 요약</h4>
+              <div class="kv" id="inputSummary"></div>
+            </div>
+            <div class="box">
+              <h4>가정값(단가) 요약</h4>
+              <div class="kv" id="assumptionSummary"></div>
+            </div>
+          </div>
+
+          <!-- Detailed table -->
+          <div class="pageBreak"></div>
+          <div class="box" style="margin-top:14px;">
+            <div class="sectionTitle" style="margin:0 0 8px;">
+              <h4 style="margin:0;">상세 계산표</h4>
+              <span class="pill">표기 단위: 천원</span>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>구분</th>
+                  <th>월 건수</th>
+                  <th>월 매출</th>
+                  <th>월 구매비용</th>
+                  <th>월 실수익</th>
+                  <th>연 매출</th>
+                  <th>연 실수익</th>
+                  <th>마진율</th>
+                </tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
+
+            <div class="insight" id="insight"></div>
+
+            <div class="footer">
+              <div>© <span id="footBrand">SIM Revenue Report</span></div>
+              <div id="footNote">* 본 리포트는 입력값 기반 자동 계산 결과이며, 실제 청구/정산 조건에 따라 달라질 수 있습니다.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ========= BRAND / TEXT =========
+    const BRAND = {
+      name: "SIM Revenue Report",
+      subtitle: "입력값 기반 자동 리포트 · PDF/엑셀 다운로드",
+      footNote: "* 본 리포트는 입력값 기반 자동 계산 결과이며, 실제 청구/정산 조건에 따라 달라질 수 있습니다."
+    };
+    document.getElementById("brandName").textContent = BRAND.name;
+    document.getElementById("brandSub").textContent = BRAND.subtitle;
+    document.getElementById("footBrand").textContent = BRAND.name;
+    document.getElementById("footNote").textContent = BRAND.footNote;
+
+    // ========= helpers =========
+    const won = (n) => new Intl.NumberFormat('ko-KR').format(Math.round(n));
+    const wonK = (n) => new Intl.NumberFormat('ko-KR').format(Math.round(n/1000)); // 천원
+    const pct = (n) => (isFinite(n) ? (n*100).toFixed(1) + "%" : "-");
+
+    const todayISO = () => {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,"0");
+      const day = String(d.getDate()).padStart(2,"0");
+      return `${y}-${m}-${day}`;
+    };
+    document.getElementById("coverDate").textContent = todayISO();
+
+    function calcBlock(count, price, cost){
+      const monthlyRevenue = price * count;
+      const monthlyCost = cost * count;
+      const monthlyProfit = monthlyRevenue - monthlyCost;
+      const yearlyRevenue = monthlyRevenue * 12;
+      const yearlyProfit = monthlyProfit * 12;
+      const margin = monthlyRevenue > 0 ? (monthlyProfit / monthlyRevenue) : NaN;
+      return {count, price, cost, monthlyRevenue, monthlyCost, monthlyProfit, yearlyRevenue, yearlyProfit, margin};
+    }
+
+    function render(){
+      const title = document.getElementById("reportTitle").value || "수익 시뮬레이션 리포트";
+      const org = document.getElementById("reportOrg").value || "";
+      document.getElementById("coverTitle").textContent = title;
+      document.getElementById("coverOrg").textContent = org;
+
+      const op = calcBlock(
+        Number(document.getElementById("opCount").value || 0),
+        Number(document.getElementById("opPrice").value || 0),
+        Number(document.getElementById("opCost").value || 0),
+      );
+      const sc = calcBlock(
+        Number(document.getElementById("scCount").value || 0),
+        Number(document.getElementById("scPrice").value || 0),
+        Number(document.getElementById("scCost").value || 0),
+      );
+
+      const totalMonthlyRevenue = op.monthlyRevenue + sc.monthlyRevenue;
+      const totalMonthlyProfit  = op.monthlyProfit  + sc.monthlyProfit;
+      const totalYearlyRevenue  = op.yearlyRevenue  + sc.yearlyRevenue;
+      const totalYearlyProfit   = op.yearlyProfit   + sc.yearlyProfit;
+
+      const totalMargin = totalMonthlyRevenue > 0 ? (totalMonthlyProfit / totalMonthlyRevenue) : NaN;
+
+      // KPIs
+      const kpis = [
+        {t:"월 총 매출(원)", v: won(totalMonthlyRevenue), s:"외래 + 검진센터 합산", cls:""},
+        {t:"월 총 실수익(원)", v: won(totalMonthlyProfit), s:"(매출 − 구매비용) 합산", cls: totalMonthlyProfit >= 0 ? "good" : "warn"},
+        {t:"연 총 실수익(원)", v: won(totalYearlyProfit), s:"월 기준 12개월 환산", cls: totalYearlyProfit >= 0 ? "good" : "warn"},
+        {t:"총 마진율", v: pct(totalMargin), s:"월 기준", cls:""},
+        {t:"외래 연 매출(원)", v: won(op.yearlyRevenue), s:`월 ${won(op.monthlyRevenue)}원 기준`, cls:""},
+        {t:"검진 연 매출(원)", v: won(sc.yearlyRevenue), s:`월 ${won(sc.monthlyRevenue)}원 기준`, cls:""}
+      ];
+      document.getElementById("kpis").innerHTML = kpis.map(k => `
+        <div class="kpi ${k.cls}">
+          <div class="t">${k.t}</div>
+          <div class="v">${k.v}</div>
+          <div class="s">${k.s}</div>
+        </div>
+      `).join("");
+
+      // Input summary
+      document.getElementById("inputSummary").innerHTML = `
+        <div class="k">외래 월 건수</div><div class="v">${won(op.count)}</div>
+        <div class="k">검진 월 건수</div><div class="v">${won(sc.count)}</div>
+        <div class="k">월 총 건수</div><div class="v">${won(op.count + sc.count)}</div>
+        <div class="k">리포트 생성일</div><div class="v">${todayISO()}</div>
+      `;
+
+      // Assumptions
+      document.getElementById("assumptionSummary").innerHTML = `
+        <div class="k">외래 단가</div><div class="v">${won(op.price)}원</div>
+        <div class="k">외래 구매단가</div><div class="v">${won(op.cost)}원</div>
+        <div class="k">검진 단가</div><div class="v">${won(sc.price)}원</div>
+        <div class="k">검진 구매단가</div><div class="v">${won(sc.cost)}원</div>
+      `;
+
+      // Detail rows (천원 단위)
+      const row = (name, b) => `
+        <tr>
+          <td><span class="tag">${name}</span></td>
+          <td>${won(b.count)}</td>
+          <td>${wonK(b.monthlyRevenue)}</td>
+          <td>${wonK(b.monthlyCost)}</td>
+          <td>${wonK(b.monthlyProfit)}</td>
+          <td>${wonK(b.yearlyRevenue)}</td>
+          <td>${wonK(b.yearlyProfit)}</td>
+          <td>${pct(b.margin)}</td>
+        </tr>
+      `;
+      document.getElementById("rows").innerHTML = row("외래", op) + row("검진센터", sc) + `
+        <tr>
+          <td><b>합계</b></td>
+          <td><b>${won(op.count + sc.count)}</b></td>
+          <td><b>${wonK(totalMonthlyRevenue)}</b></td>
+          <td><b>${wonK(op.monthlyCost + sc.monthlyCost)}</b></td>
+          <td><b>${wonK(totalMonthlyProfit)}</b></td>
+          <td><b>${wonK(totalYearlyRevenue)}</b></td>
+          <td><b>${wonK(totalYearlyProfit)}</b></td>
+          <td><b>${pct(totalMargin)}</b></td>
+        </tr>
+      `;
+
+      // Insight
+      const best = (op.monthlyProfit >= sc.monthlyProfit) ? "외래" : "검진센터";
+      const bestProfit = Math.max(op.monthlyProfit, sc.monthlyProfit);
+      const gap = Math.abs(op.monthlyProfit - sc.monthlyProfit);
+
+      const insightLines = [
+        `월 기준으로 <b>${best}</b>이 더 큰 실수익을 만들고 있습니다. (월 실수익: <b>${won(bestProfit)}원</b>)`,
+        `외래/검진센터 월 실수익 격차는 <b>${won(gap)}원</b> 입니다.`,
+        `총 마진율은 <b>${pct(totalMargin)}</b>이며, 월 총 실수익은 <b>${won(totalMonthlyProfit)}원</b>입니다.`,
+        `연 환산 기준 총 실수익은 <b>${won(totalYearlyProfit)}원</b>입니다.`
+      ];
+
+      document.getElementById("insight").innerHTML =
+        `<b>핵심 인사이트</b><br>` + insightLines.map(x => "• " + x).join("<br>");
+
+      return { title, org, op, sc, totalMonthlyRevenue, totalMonthlyProfit, totalYearlyRevenue, totalYearlyProfit, totalMargin };
+    }
+
+    // ========= events =========
+    const bindIds = ["reportTitle","reportOrg","opCount","opPrice","opCost","scCount","scPrice","scCost"];
+    bindIds.forEach(id => document.getElementById(id).addEventListener("input", render));
+
+    document.getElementById("btnPrint").addEventListener("click", () => window.print());
+
+    document.getElementById("btnPdf").addEventListener("click", () => {
+      render();
+      const el = document.getElementById("report");
+      const filename = `수익리포트_${todayISO()}.pdf`;
+
+      const opt = {
+        margin: [8, 8, 8, 8], // mm
+        filename,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["css", "legacy"] }
+      };
+      html2pdf().set(opt).from(el).save();
+    });
+
+    document.getElementById("btnXlsx").addEventListener("click", () => {
+      const r = render();
+      const rows = [
+        ["리포트 제목", r.title],
+        ["기관/프로젝트", r.org],
+        ["생성일", todayISO()],
+        [],
+        ["구분","월 건수","월 매출(원)","월 구매비용(원)","월 실수익(원)","연 매출(원)","연 실수익(원)","마진율"],
+        ["외래", r.op.count, r.op.monthlyRevenue, r.op.monthlyCost, r.op.monthlyProfit, r.op.yearlyRevenue, r.op.yearlyProfit, (isFinite(r.op.margin)?r.op.margin:0)],
+        ["검진센터", r.sc.count, r.sc.monthlyRevenue, r.sc.monthlyCost, r.sc.monthlyProfit, r.sc.yearlyRevenue, r.sc.yearlyProfit, (isFinite(r.sc.margin)?r.sc.margin:0)],
+        ["합계", r.op.count+r.sc.count, r.totalMonthlyRevenue, r.op.monthlyCost+r.sc.monthlyCost, r.totalMonthlyProfit, r.totalYearlyRevenue, r.totalYearlyProfit, (isFinite(r.totalMargin)?r.totalMargin:0)],
+        [],
+        ["가정값(원)"],
+        ["외래 단가", r.op.price],
+        ["외래 구매단가", r.op.cost],
+        ["검진 단가", r.sc.price],
+        ["검진 구매단가", r.sc.cost]
+      ];
+
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+
+      // formatting hint (column widths)
+      ws["!cols"] = [{wch:18},{wch:22},{wch:16},{wch:16},{wch:16},{wch:16},{wch:16},{wch:10}];
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Report");
+      XLSX.writeFile(wb, `수익리포트_${todayISO()}.xlsx`, { compression:true });
+    });
+
+    // init
+    render();
+  </script>
+</body>
+</html>
