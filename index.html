@@ -78,7 +78,6 @@
       background: linear-gradient(135deg, rgba(37,99,235,.12), rgba(236,72,153,.12));
       color:#0b1220;
     }
-    .tiny{ font-size:11px; color:var(--muted); font-weight:800; }
 
     .grid{display:grid; gap:14px;}
     .grid-2{grid-template-columns: 1fr 1.25fr;}
@@ -192,9 +191,6 @@
       .pageBreak{break-before: page;}
     }
 
-    .a4Hint{font-size:11px; color:var(--muted); margin-top:10px;}
-
-    /* overlay */
     #pdfOverlay{
       position: fixed; inset: 0;
       background: rgba(11,18,32,.45);
@@ -225,7 +221,6 @@
     }
     @keyframes pdfbar{ 0%{transform:translateX(-120%);} 100%{transform:translateX(320%);} }
 
-    /* debug panel */
     #debugPanel{
       margin-top:10px;
       border:1px solid var(--line);
@@ -238,16 +233,9 @@
     }
     #debugPanel .h{font-weight:950; margin-bottom:6px;}
     #debugPanel pre{
-      margin:0;
-      white-space:pre-wrap;
-      word-break:break-word;
-      color:#334155;
-      background:#f8fafc;
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:10px;
-      max-height:220px;
-      overflow:auto;
+      margin:0; white-space:pre-wrap; word-break:break-word;
+      color:#334155; background:#f8fafc; border:1px solid var(--line);
+      border-radius:12px; padding:10px; max-height:220px; overflow:auto;
     }
   </style>
 </head>
@@ -282,7 +270,6 @@
     </div>
 
     <div class="grid grid-2">
-      <!-- Inputs -->
       <div class="card">
         <div class="sectionTitle">
           <h2>입력</h2>
@@ -312,21 +299,9 @@
             <span class="tag">단위: 원</span>
           </div>
           <div class="formGrid">
-            <div>
-              <label>월 검사 건수</label>
-              <input id="opCount" class="hi" type="number" min="0" value="100" />
-              <div class="help">예: 100, 1000, 2000</div>
-            </div>
-            <div>
-              <label>환자 청구 단가</label>
-              <input id="opPrice" class="hi" type="number" min="0" value="9300" />
-              <div class="help">기본값: 9,300원</div>
-            </div>
-            <div>
-              <label>구매 단가</label>
-              <input id="opCost" class="hi" type="number" min="0" value="6000" />
-              <div class="help">기본값: 6,000원</div>
-            </div>
+            <div><label>월 검사 건수</label><input id="opCount" class="hi" type="number" min="0" value="100" /></div>
+            <div><label>환자 청구 단가</label><input id="opPrice" class="hi" type="number" min="0" value="9300" /></div>
+            <div><label>구매 단가</label><input id="opCost" class="hi" type="number" min="0" value="6000" /></div>
           </div>
         </div>
 
@@ -338,28 +313,13 @@
             <span class="tag">단위: 원</span>
           </div>
           <div class="formGrid">
-            <div>
-              <label>월 검사 건수</label>
-              <input id="scCount" class="hi" type="number" min="0" value="1000" />
-              <div class="help">예: 1000</div>
-            </div>
-            <div>
-              <label>검진 청구 단가</label>
-              <input id="scPrice" class="hi" type="number" min="0" value="30000" />
-              <div class="help">기본값: 30,000원</div>
-            </div>
-            <div>
-              <label>구매 단가</label>
-              <input id="scCost" class="hi" type="number" min="0" value="12000" />
-              <div class="help">기본값: 12,000원</div>
-            </div>
+            <div><label>월 검사 건수</label><input id="scCount" class="hi" type="number" min="0" value="1000" /></div>
+            <div><label>검진 청구 단가</label><input id="scPrice" class="hi" type="number" min="0" value="30000" /></div>
+            <div><label>구매 단가</label><input id="scCost" class="hi" type="number" min="0" value="12000" /></div>
           </div>
         </div>
-
-        <div class="a4Hint">PDF는 보고서 영역을 A4로 저장합니다.</div>
       </div>
 
-      <!-- Report -->
       <div id="report" class="card" style="padding:0;">
         <div class="cover">
           <div class="coverRow">
@@ -389,7 +349,6 @@
             </div>
           </div>
 
-          <div class="pageBreak"></div>
           <div class="box" style="margin-top:14px;">
             <div class="sectionTitle" style="margin:0 0 8px;">
               <h4 style="margin:0;">상세 계산표</h4>
@@ -398,14 +357,8 @@
             <table>
               <thead>
                 <tr>
-                  <th>구분</th>
-                  <th>월 건수</th>
-                  <th>월 매출</th>
-                  <th>월 구매비용</th>
-                  <th>월 실수익</th>
-                  <th>연 매출</th>
-                  <th class="yProfit">연 실수익</th>
-                  <th>마진율</th>
+                  <th>구분</th><th>월 건수</th><th>월 매출</th><th>월 구매비용</th>
+                  <th>월 실수익</th><th>연 매출</th><th class="yProfit">연 실수익</th><th>마진율</th>
                 </tr>
               </thead>
               <tbody id="rows"></tbody>
@@ -424,7 +377,6 @@
     </div>
   </div>
 
-  <!-- overlay -->
   <div id="pdfOverlay" aria-hidden="true">
     <div class="overlayBox">
       <div class="t">PDF 생성 중…</div>
@@ -434,18 +386,6 @@
   </div>
 
   <script>
-    // ===== brand =====
-    const BRAND = {
-      name: "SIM Revenue Report",
-      subtitle: "입력값 기반 자동 리포트 · PDF/엑셀 다운로드",
-      footNote: "* 본 리포트는 입력값 기반 자동 계산 결과이며, 실제 청구/정산 조건에 따라 달라질 수 있습니다."
-    };
-    document.getElementById("brandName").textContent = BRAND.name;
-    document.getElementById("brandSub").textContent = BRAND.subtitle;
-    document.getElementById("footBrand").textContent = BRAND.name;
-    document.getElementById("footNote").textContent = BRAND.footNote;
-
-    // ===== helpers =====
     const won = (n) => new Intl.NumberFormat('ko-KR').format(Math.round(n));
     const wonK = (n) => new Intl.NumberFormat('ko-KR').format(Math.round(n/1000));
     const pct = (n) => (isFinite(n) ? (n*100).toFixed(1) + "%" : "-");
@@ -474,16 +414,8 @@
       document.getElementById("coverTitle").textContent = title;
       document.getElementById("coverOrg").textContent = org;
 
-      const op = calcBlock(
-        Number(document.getElementById("opCount").value || 0),
-        Number(document.getElementById("opPrice").value || 0),
-        Number(document.getElementById("opCost").value || 0),
-      );
-      const sc = calcBlock(
-        Number(document.getElementById("scCount").value || 0),
-        Number(document.getElementById("scPrice").value || 0),
-        Number(document.getElementById("scCost").value || 0),
-      );
+      const op = calcBlock(+document.getElementById("opCount").value||0, +document.getElementById("opPrice").value||0, +document.getElementById("opCost").value||0);
+      const sc = calcBlock(+document.getElementById("scCount").value||0, +document.getElementById("scPrice").value||0, +document.getElementById("scCost").value||0);
 
       const totalMonthlyRevenue = op.monthlyRevenue + sc.monthlyRevenue;
       const totalMonthlyProfit  = op.monthlyProfit  + sc.monthlyProfit;
@@ -495,9 +427,6 @@
         {t:"월 총 매출(원)", v: won(totalMonthlyRevenue), s:"외래 + 검진센터 합산", cls:""},
         {t:"월 총 실수익(원)", v: won(totalMonthlyProfit), s:"(매출 − 구매비용) 합산", cls: totalMonthlyProfit >= 0 ? "good" : "warn"},
         {t:"연 총 실수익(원)", v: won(totalYearlyProfit), s:"월 기준 12개월 환산", cls: totalYearlyProfit >= 0 ? "good" : "warn"},
-        {t:"총 마진율", v: pct(totalMargin), s:"월 기준", cls:""},
-        {t:"외래 연 매출(원)", v: won(op.yearlyRevenue), s:`월 ${won(op.monthlyRevenue)}원 기준`, cls:""},
-        {t:"검진 연 매출(원)", v: won(sc.yearlyRevenue), s:`월 ${won(sc.monthlyRevenue)}원 기준`, cls:""}
       ];
       document.getElementById("kpis").innerHTML = kpis.map(k => `
         <div class="kpi ${k.cls}">
@@ -545,21 +474,16 @@
           <td><b>${pct(totalMargin)}</b></td>
         </tr>`;
 
-      const best = (op.monthlyProfit >= sc.monthlyProfit) ? "외래" : "검진센터";
-      const bestProfit = Math.max(op.monthlyProfit, sc.monthlyProfit);
-      const gap = Math.abs(op.monthlyProfit - sc.monthlyProfit);
-
       document.getElementById("insight").innerHTML =
         `<b>핵심 인사이트</b><br>
-         • 월 기준으로 <b>${best}</b>이 더 큰 실수익을 만들고 있습니다. (월 실수익: <b>${won(bestProfit)}원</b>)<br>
-         • 외래/검진센터 월 실수익 격차는 <b>${won(gap)}원</b> 입니다.<br>
-         • 총 마진율은 <b>${pct(totalMargin)}</b>이며, 월 총 실수익은 <b>${won(totalMonthlyProfit)}원</b>입니다.<br>
-         • 연 환산 기준 총 실수익은 <b>${won(totalYearlyProfit)}원</b>입니다.`;
+         • 월 총 실수익: <b>${won(totalMonthlyProfit)}원</b><br>
+         • 연 총 실수익: <b>${won(totalYearlyProfit)}원</b><br>
+         • 총 마진율: <b>${pct(totalMargin)}</b>`;
 
-      return { title, org, op, sc, totalMonthlyRevenue, totalMonthlyProfit, totalYearlyRevenue, totalYearlyProfit, totalMargin };
+      return { totalMonthlyProfit, totalYearlyProfit };
     }
 
-    // ===== debug =====
+    // debug UI
     const debugPanel = document.getElementById("debugPanel");
     const debugText = document.getElementById("debugText");
     function logDebug(msg){
@@ -570,7 +494,6 @@
     window.addEventListener("error", (e)=> logDebug("[window.error] " + (e.message || e.error || "unknown")));
     window.addEventListener("unhandledrejection", (e)=> logDebug("[promise] " + (e.reason?.message || e.reason || "unknown")));
 
-    // ===== events =====
     ["reportTitle","reportOrg","opCount","opPrice","opCost","scCount","scPrice","scCost"]
       .forEach(id => document.getElementById(id).addEventListener("input", render));
 
@@ -579,28 +502,25 @@
     function getPdfMode(){ return document.getElementById("qHigh").checked ? "high" : "fast"; }
 
     async function makePdf(mode){
-      // sanity check
-      if (!window.html2pdf) throw new Error("html2pdf 라이브러리가 로드되지 않았습니다. (CDN 차단/네트워크/CSP 가능)");
-      if (!window.html2pdf.Worker) throw new Error("html2pdf.Worker가 없습니다. (라이브러리 로드 불완전)");
-
+      if (!window.html2pdf) throw new Error("html2pdf 라이브러리가 로드되지 않았습니다.");
       const isMobile = window.matchMedia("(max-width: 840px)").matches;
 
-      // 요청값: fast = PC 1.4 / 모바일 1.2
+      // PNG는 용량이 커질 수 있어 scale을 조금 보수적으로
       const scale = (mode === "fast")
-        ? (isMobile ? 1.2 : 1.4)
-        : (isMobile ? 1.7 : 2.1);
+        ? (isMobile ? 1.1 : 1.25)   // PNG fast
+        : (isMobile ? 1.4 : 1.7);   // PNG high
 
-      const quality = (mode === "fast") ? 0.86 : 0.95;
-
-      // fast는 reportBody만(더 빠름), high는 report 전체(표지 포함)
-      const el = (mode === "fast") ? document.getElementById("reportBody") : document.getElementById("report");
+      const el = (mode === "fast")
+        ? document.getElementById("reportBody")
+        : document.getElementById("report");
 
       const filename = `수익리포트_${todayISO()}_${mode}.pdf`;
 
       const opt = {
         margin: [8, 8, 8, 8],
         filename,
-        image: { type: "jpeg", quality },
+        // ✅ 핵심: JPEG 대신 PNG로 고정 -> Unsupported image type 해결
+        image: { type: "png" },
         html2canvas: {
           scale,
           useCORS: true,
@@ -608,12 +528,12 @@
           logging: false,
           removeContainer: true
         },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait", compress: true },
         pagebreak: { mode: ["css", "legacy"] }
       };
 
-      // Worker 패턴(가장 안정적)
-      const worker = new html2pdf.Worker(opt).from(el);
+      // Worker 패턴
+      const worker = html2pdf().set(opt).from(el);
       return { worker, filename };
     }
 
@@ -634,31 +554,27 @@
         const mode = getPdfMode();
         overlayMsg.textContent = (mode === "fast") ? "빠른 PDF 변환 중…" : "고화질 PDF 변환 중…";
 
-        await new Promise(r => setTimeout(r, 80)); // overlay paint
+        await new Promise(r => setTimeout(r, 80));
 
         logDebug("[step] worker 생성");
         const { worker } = await makePdf(mode);
 
-        // 1) 먼저 save 시도
         logDebug("[step] save() 시도");
         await worker.save();
         logDebug("[ok] save() 완료");
       } catch (e) {
-        // save 실패시 bloburl로 새탭 열기(다운로드 막힘/권한 문제 포함)
         logDebug("[error] " + (e?.message || e));
 
+        // fallback: 새 탭 미리보기
         try{
-          const mode = getPdfMode();
           logDebug("[fallback] blob 생성 후 새 탭 열기");
+          const mode = getPdfMode();
           const { worker } = await makePdf(mode);
-          const blob = await worker.outputPdf("blob"); // 안정적
-          const url = URL.createObjectURL(blob);
+          const pdf = await worker.outputPdf("blob");
+          const url = URL.createObjectURL(pdf);
           const w = window.open(url, "_blank", "noopener");
-          if (!w) {
-            logDebug("[fallback] 팝업이 차단되었습니다. 브라우저에서 팝업 허용 후 다시 시도해 주세요.");
-          } else {
-            logDebug("[ok] 새 탭 미리보기 열림 (그 화면에서 저장 가능)");
-          }
+          if (!w) logDebug("[fallback] 팝업이 차단되었습니다. 팝업 허용 후 다시 시도해 주세요.");
+          else logDebug("[ok] 새 탭 미리보기 열림 (그 화면에서 저장 가능)");
         } catch (e2) {
           logDebug("[fallback error] " + (e2?.message || e2));
         }
@@ -670,25 +586,26 @@
     });
 
     document.getElementById("btnXlsx").addEventListener("click", () => {
-      const r = render();
+      const title = document.getElementById("reportTitle").value || "수익 시뮬레이션 리포트";
+      const org = document.getElementById("reportOrg").value || "";
+      const opCount = +document.getElementById("opCount").value||0;
+      const scCount = +document.getElementById("scCount").value||0;
       const rows = [
-        ["리포트 제목", r.title],
-        ["기관/프로젝트", r.org],
+        ["리포트 제목", title],
+        ["기관/프로젝트", org],
         ["생성일", todayISO()],
         [],
-        ["구분","월 건수","월 매출(원)","월 구매비용(원)","월 실수익(원)","연 매출(원)","연 실수익(원)","마진율"],
-        ["외래", r.op.count, r.op.monthlyRevenue, r.op.monthlyCost, r.op.monthlyProfit, r.op.yearlyRevenue, r.op.yearlyProfit, (isFinite(r.op.margin)?r.op.margin:0)],
-        ["검진센터", r.sc.count, r.sc.monthlyRevenue, r.sc.monthlyCost, r.sc.monthlyProfit, r.sc.yearlyRevenue, r.sc.yearlyProfit, (isFinite(r.sc.margin)?r.sc.margin:0)],
-        ["합계", r.op.count+r.sc.count, r.totalMonthlyRevenue, r.op.monthlyCost+r.sc.monthlyCost, r.totalMonthlyProfit, r.totalYearlyRevenue, r.totalYearlyProfit, (isFinite(r.totalMargin)?r.totalMargin:0)],
+        ["항목", "값"],
+        ["외래 월 건수", opCount],
+        ["검진 월 건수", scCount],
       ];
       const ws = XLSX.utils.aoa_to_sheet(rows);
-      ws["!cols"] = [{wch:18},{wch:22},{wch:16},{wch:16},{wch:16},{wch:16},{wch:16},{wch:10}];
+      ws["!cols"] = [{wch:18},{wch:26}];
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Report");
       XLSX.writeFile(wb, `수익리포트_${todayISO()}.xlsx`, { compression:true });
     });
 
-    // init
     render();
   </script>
 </body>
