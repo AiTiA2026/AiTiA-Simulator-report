@@ -12,7 +12,6 @@
 
   <style>
     :root{
-      /* Blue + Pink theme */
       --bg:#f7f8ff;
       --card:#ffffff;
       --text:#0b1220;
@@ -20,15 +19,10 @@
       --line:#e7e9ef;
       --soft:#f2f4ff;
 
-      /* BRAND */
-      --brand:#2563eb;     /* blue */
-      --brand2:#ec4899;    /* pink */
-      --accent:#2563eb;
-      --accent2:#ec4899;
-      --accentSoft:#eef2ff;
+      --brand:#2563eb;
+      --brand2:#ec4899;
 
       --good:#027a48;
-      --bad:#b42318;
       --warn:#b54708;
 
       --r:18px;
@@ -51,9 +45,7 @@
       display:flex; gap:12px; align-items:center; justify-content:space-between;
       margin-bottom:14px;
     }
-    .brand{
-      display:flex; gap:12px; align-items:center;
-    }
+    .brand{display:flex; gap:12px; align-items:center;}
     .logo{
       width:42px; height:42px; border-radius:14px;
       background: linear-gradient(135deg, var(--brand), var(--brand2));
@@ -62,7 +54,7 @@
     .brand h1{font-size:16px; margin:0; letter-spacing:-.2px;}
     .brand p{margin:2px 0 0; font-size:12px; color:var(--muted);}
 
-    .actions{display:flex; gap:10px; flex-wrap:wrap;}
+    .actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
     button{
       border:1px solid var(--line);
       background:#fff;
@@ -84,10 +76,33 @@
       border: none;
       box-shadow: 0 10px 18px rgba(37,99,235,.18), 0 10px 18px rgba(236,72,153,.14);
     }
-    button.primary:hover{
-      filter: brightness(1.02);
-      transform: translateY(-1px);
+    button.primary:hover{ filter: brightness(1.02); transform: translateY(-1px); }
+
+    /* PDF Quality Toggle */
+    .seg{
+      display:inline-flex;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow: var(--shadow);
     }
+    .seg input{ display:none; }
+    .seg label{
+      padding:9px 10px;
+      font-size:12px;
+      font-weight:950;
+      color:#334155;
+      cursor:pointer;
+      user-select:none;
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    .seg label + label{ border-left:1px solid var(--line); }
+    .seg input:checked + label{
+      background: linear-gradient(135deg, rgba(37,99,235,.12), rgba(236,72,153,.12));
+      color:#0b1220;
+    }
+    .tiny{ font-size:11px; color:var(--muted); font-weight:800; }
 
     .grid{display:grid; gap:14px;}
     .grid-2{grid-template-columns: 1fr 1.25fr;}
@@ -155,14 +170,8 @@
     .coverRow{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; position:relative; z-index:1;}
     .cover h3{margin:0; font-size:18px; letter-spacing:-.3px;}
     .cover .meta{margin-top:6px; color: rgba(255,255,255,.80); font-size:12px; line-height:1.5;}
-    .cover .stamp{
-      text-align:right;
-      font-size:11px;
-      color: rgba(255,255,255,.78);
-    }
-    .cover .stamp .big{
-      display:block; font-size:14px; font-weight:900; color:#fff; margin-top:4px;
-    }
+    .cover .stamp{text-align:right; font-size:11px; color: rgba(255,255,255,.78);}
+    .cover .stamp .big{display:block; font-size:14px; font-weight:900; color:#fff; margin-top:4px;}
     .cover .badge{
       display:inline-flex; align-items:center; gap:8px;
       margin-top:12px;
@@ -221,11 +230,7 @@
       text-align:right;
       vertical-align:middle;
     }
-    th{
-      background:#fafbff;
-      font-weight:950;
-      color:#344054;
-    }
+    th{background:#fafbff; font-weight:950; color:#344054;}
     th:first-child, td:first-child{ text-align:left; }
     .tag{
       display:inline-block;
@@ -247,10 +252,10 @@
       background: linear-gradient(180deg, rgba(236,72,153,.16), rgba(37,99,235,.12));
     }
 
-    /* Insight - stronger */
+    /* Insight 강조 */
     .insight{
       margin-top:12px;
-      padding:14px 14px;
+      padding:14px 14px 14px 38px;
       border-radius:16px;
       border: 1px solid rgba(37,99,235,.28);
       background:
@@ -261,7 +266,6 @@
       line-height:1.65;
       position:relative;
       box-shadow: 0 10px 24px rgba(37,99,235,.10), 0 10px 24px rgba(236,72,153,.08);
-      padding-left:38px;
     }
     .insight::before{
       content:"💡";
@@ -296,17 +300,11 @@
       .pageBreak{break-before: page;}
     }
 
-    /* Make report look like A4 */
-    .a4Hint{
-      font-size:11px;
-      color:var(--muted);
-      margin-top:10px;
-    }
+    .a4Hint{font-size:11px; color:var(--muted); margin-top:10px;}
 
-    /* PDF generation overlay (prevents "frozen" feeling) */
+    /* PDF overlay */
     #pdfOverlay{
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background: rgba(11,18,32,.45);
       backdrop-filter: blur(4px);
       display: none;
@@ -322,32 +320,51 @@
       padding: 14px;
       box-shadow: var(--shadow);
     }
-    #pdfOverlay .t{
-      font-weight: 950;
-      margin-bottom: 6px;
-    }
-    #pdfOverlay .s{
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-    }
+    #pdfOverlay .t{ font-weight: 950; margin-bottom: 6px; }
+    #pdfOverlay .s{ color: var(--muted); font-size: 12px; line-height: 1.5; }
     #pdfOverlay .bar{
-      height: 10px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: #eef2ff;
-      border: 1px solid var(--line);
-      margin-top: 10px;
+      height: 10px; border-radius: 999px; overflow: hidden;
+      background: #eef2ff; border: 1px solid var(--line); margin-top: 10px;
     }
     #pdfOverlay .bar > div{
-      height: 100%;
-      width: 40%;
+      height: 100%; width: 40%;
       background: linear-gradient(135deg, var(--brand), var(--brand2));
       animation: pdfbar 1.05s ease-in-out infinite;
     }
     @keyframes pdfbar{
       0%{ transform: translateX(-120%); }
       100%{ transform: translateX(320%); }
+    }
+
+    /* PDF fallback link toast */
+    #pdfToast{
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      z-index: 10000;
+      display: none;
+      width: min(520px, calc(100% - 32px));
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 12px;
+    }
+    #pdfToast .h{font-weight:950; margin-bottom:6px;}
+    #pdfToast .p{font-size:12px; color:var(--muted); line-height:1.55;}
+    #pdfToast a{
+      display:inline-block;
+      margin-top:10px;
+      font-weight:950;
+      color:#0b1220;
+      text-decoration:none;
+      padding:9px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: linear-gradient(135deg, rgba(37,99,235,.10), rgba(236,72,153,.10));
+    }
+    #pdfToast .x{
+      float:right; cursor:pointer; font-weight:950; color:var(--muted);
     }
   </style>
 </head>
@@ -362,7 +379,17 @@
           <p id="brandSub">입력값 기반 자동 리포트 · PDF/엑셀 다운로드</p>
         </div>
       </div>
+
       <div class="actions">
+        <!-- PDF quality toggle -->
+        <div class="seg" role="group" aria-label="PDF 품질">
+          <input id="qFast" name="pdfQ" type="radio" checked />
+          <label for="qFast">⚡ 빠른 PDF</label>
+          <input id="qHigh" name="pdfQ" type="radio" />
+          <label for="qHigh">✨ 고화질 PDF</label>
+        </div>
+        <span class="tiny">PDF 품질 선택</span>
+
         <button id="btnPdf" class="primary">PDF 다운로드</button>
         <button id="btnXlsx">엑셀 다운로드</button>
         <button id="btnPrint">인쇄</button>
@@ -449,7 +476,6 @@
 
       <!-- Report -->
       <div id="report" class="card" style="padding:0;">
-        <!-- Cover -->
         <div class="cover">
           <div class="coverRow">
             <div>
@@ -465,10 +491,8 @@
         </div>
 
         <div class="reportBody" id="reportBody">
-          <!-- KPIs -->
           <div class="kpis" id="kpis"></div>
 
-          <!-- Summary boxes -->
           <div class="twoCols">
             <div class="box">
               <h4>입력값 요약</h4>
@@ -480,7 +504,6 @@
             </div>
           </div>
 
-          <!-- Detailed table -->
           <div class="pageBreak"></div>
           <div class="box" style="margin-top:14px;">
             <div class="sectionTitle" style="margin:0 0 8px;">
@@ -516,13 +539,24 @@
     </div>
   </div>
 
-  <!-- PDF generation overlay -->
+  <!-- PDF overlay -->
   <div id="pdfOverlay" aria-hidden="true">
     <div class="overlayBox">
       <div class="t">PDF 생성 중…</div>
-      <div class="s">리포트를 변환하고 있어요. 잠시만 기다려 주세요.<br/>완료되면 자동으로 다운로드됩니다.</div>
+      <div class="s">브라우저에서 변환을 진행 중입니다. 느릴 수 있어요.<br/>완료되면 자동으로 다운로드(또는 새 탭 미리보기) 됩니다.</div>
       <div class="bar"><div></div></div>
     </div>
+  </div>
+
+  <!-- PDF fallback toast -->
+  <div id="pdfToast">
+    <span class="x" id="toastClose">닫기</span>
+    <div class="h">다운로드가 막혔어요</div>
+    <div class="p">
+      일부 브라우저/보안 설정에서 자동 다운로드가 제한될 수 있어요.<br/>
+      아래 버튼으로 <b>PDF를 새 탭에서 열고</b> 그 화면에서 저장해 주세요.
+    </div>
+    <a id="pdfPreviewLink" href="#" target="_blank" rel="noopener">PDF 미리보기 열기</a>
   </div>
 
   <script>
@@ -537,7 +571,6 @@
     document.getElementById("footBrand").textContent = BRAND.name;
     document.getElementById("footNote").textContent = BRAND.footNote;
 
-    // ========= helpers =========
     const won = (n) => new Intl.NumberFormat('ko-KR').format(Math.round(n));
     const wonK = (n) => new Intl.NumberFormat('ko-KR').format(Math.round(n/1000)); // 천원
     const pct = (n) => (isFinite(n) ? (n*100).toFixed(1) + "%" : "-");
@@ -582,10 +615,8 @@
       const totalMonthlyProfit  = op.monthlyProfit  + sc.monthlyProfit;
       const totalYearlyRevenue  = op.yearlyRevenue  + sc.yearlyRevenue;
       const totalYearlyProfit   = op.yearlyProfit   + sc.yearlyProfit;
-
       const totalMargin = totalMonthlyRevenue > 0 ? (totalMonthlyProfit / totalMonthlyRevenue) : NaN;
 
-      // KPIs
       const kpis = [
         {t:"월 총 매출(원)", v: won(totalMonthlyRevenue), s:"외래 + 검진센터 합산", cls:""},
         {t:"월 총 실수익(원)", v: won(totalMonthlyProfit), s:"(매출 − 구매비용) 합산", cls: totalMonthlyProfit >= 0 ? "good" : "warn"},
@@ -602,7 +633,6 @@
         </div>
       `).join("");
 
-      // Input summary
       document.getElementById("inputSummary").innerHTML = `
         <div class="k">외래 월 건수</div><div class="v">${won(op.count)}</div>
         <div class="k">검진 월 건수</div><div class="v">${won(sc.count)}</div>
@@ -610,7 +640,6 @@
         <div class="k">리포트 생성일</div><div class="v">${todayISO()}</div>
       `;
 
-      // Assumptions
       document.getElementById("assumptionSummary").innerHTML = `
         <div class="k">외래 단가</div><div class="v">${won(op.price)}원</div>
         <div class="k">외래 구매단가</div><div class="v">${won(op.cost)}원</div>
@@ -618,7 +647,6 @@
         <div class="k">검진 구매단가</div><div class="v">${won(sc.cost)}원</div>
       `;
 
-      // Detail rows (천원 단위)
       const row = (name, b) => `
         <tr>
           <td><span class="tag">${name}</span></td>
@@ -647,7 +675,6 @@
         </tr>
       `;
 
-      // Insight
       const best = (op.monthlyProfit >= sc.monthlyProfit) ? "외래" : "검진센터";
       const bestProfit = Math.max(op.monthlyProfit, sc.monthlyProfit);
       const gap = Math.abs(op.monthlyProfit - sc.monthlyProfit);
@@ -658,53 +685,71 @@
         `총 마진율은 <b>${pct(totalMargin)}</b>이며, 월 총 실수익은 <b>${won(totalMonthlyProfit)}원</b>입니다.`,
         `연 환산 기준 총 실수익은 <b>${won(totalYearlyProfit)}원</b>입니다.`
       ];
-
       document.getElementById("insight").innerHTML =
         `<b>핵심 인사이트</b><br>` + insightLines.map(x => "• " + x).join("<br>");
 
       return { title, org, op, sc, totalMonthlyRevenue, totalMonthlyProfit, totalYearlyRevenue, totalYearlyProfit, totalMargin };
     }
 
-    // ========= events =========
+    // ======= Toast helpers (fallback) =======
+    function showToast(blobUrl){
+      const toast = document.getElementById("pdfToast");
+      const link = document.getElementById("pdfPreviewLink");
+      link.href = blobUrl;
+      toast.style.display = "block";
+    }
+    function hideToast(){
+      document.getElementById("pdfToast").style.display = "none";
+    }
+    document.getElementById("toastClose").addEventListener("click", hideToast);
+
+    // ======= PDF quality mode =======
+    function getPdfMode(){
+      return document.getElementById("qHigh").checked ? "high" : "fast";
+    }
+
+    // ======= events =======
     const bindIds = ["reportTitle","reportOrg","opCount","opPrice","opCost","scCount","scPrice","scCost"];
     bindIds.forEach(id => document.getElementById(id).addEventListener("input", render));
 
     document.getElementById("btnPrint").addEventListener("click", () => window.print());
 
-    // PDF optimized (less lag)
+    // PDF: fast/high toggle + fallback preview
     document.getElementById("btnPdf").addEventListener("click", async () => {
       const btn = document.getElementById("btnPdf");
       const overlay = document.getElementById("pdfOverlay");
       const oldText = btn.textContent;
 
       try{
+        hideToast();
         render();
 
         btn.disabled = true;
         btn.textContent = "PDF 생성 중…";
         overlay.style.display = "flex";
 
-        // 캡처 영역 축소: report 전체가 아니라 reportBody만
-        const el = document.getElementById("reportBody");
-
-        // 디바이스 상황에 따라 scale 자동 조절 (속도 ↑)
+        const mode = getPdfMode();
         const isMobile = window.matchMedia("(max-width: 840px)").matches;
-        const deviceMem = navigator.deviceMemory || 4;         // Chrome only; fallback 4
-        const cores = navigator.hardwareConcurrency || 4;
 
-        let scale = 2.0;
-        if (isMobile) scale = 1.4;
-        if (deviceMem <= 4 || cores <= 4) scale = Math.min(scale, 1.6);
-        if (deviceMem <= 2 || cores <= 2) scale = 1.3;
+        // ✅ 요청값 반영: fast 기준
+        const scaleFast = isMobile ? 1.2 : 1.4;
 
-        const filename = `수익리포트_${todayISO()}.pdf`;
+        // high 기준 (조금 더 선명, 느려짐)
+        const scaleHigh = isMobile ? 1.7 : 2.1;
+
+        // 캡처 영역: fast는 reportBody(빠름), high는 report 전체(표지 포함)
+        const el = (mode === "high")
+          ? document.getElementById("report")
+          : document.getElementById("reportBody");
+
+        const filename = `수익리포트_${todayISO()}_${mode}.pdf`;
 
         const opt = {
-          margin: [8, 8, 8, 8], // mm
+          margin: [8, 8, 8, 8],
           filename,
-          image: { type: "jpeg", quality: 0.92 }, // 품질 약간 낮춰서 속도/용량 개선
+          image: { type: "jpeg", quality: (mode === "high" ? 0.95 : 0.86) },
           html2canvas: {
-            scale,
+            scale: (mode === "high" ? scaleHigh : scaleFast),
             useCORS: true,
             backgroundColor: "#ffffff",
             logging: false,
@@ -714,10 +759,19 @@
           pagebreak: { mode: ["css", "legacy"] }
         };
 
-        // overlay가 먼저 그려지도록 잠깐 yield
+        // overlay paint
         await new Promise(r => setTimeout(r, 80));
 
-        await html2pdf().set(opt).from(el).save();
+        // 1) 기본 다운로드 시도
+        try{
+          await html2pdf().set(opt).from(el).save();
+          return;
+        } catch (e) {
+          // 2) save()가 막히면: PDF blob URL 만들어서 새 탭 미리보기로 제공
+          const worker = html2pdf().set(opt).from(el).toPdf();
+          const blobUrl = await worker.outputPdf("bloburl");
+          showToast(blobUrl);
+        }
       } finally {
         overlay.style.display = "none";
         btn.disabled = false;
