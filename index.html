@@ -71,7 +71,12 @@
       font-weight:800;
       cursor:pointer;
       color:var(--text);
-      transition: transform .12s ease, filter .12s ease;
+      transition: transform .12s ease, filter .12s ease, opacity .12s ease;
+    }
+    button:disabled{
+      opacity:.65;
+      cursor:not-allowed;
+      transform:none !important;
     }
     button.primary{
       background: linear-gradient(135deg, var(--brand), var(--brand2));
@@ -242,6 +247,7 @@
       background: linear-gradient(180deg, rgba(236,72,153,.16), rgba(37,99,235,.12));
     }
 
+    /* Insight - stronger */
     .insight{
       margin-top:12px;
       padding:14px 14px;
@@ -295,6 +301,53 @@
       font-size:11px;
       color:var(--muted);
       margin-top:10px;
+    }
+
+    /* PDF generation overlay (prevents "frozen" feeling) */
+    #pdfOverlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(11,18,32,.45);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    #pdfOverlay .overlayBox{
+      width: min(420px, calc(100% - 32px));
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+    #pdfOverlay .t{
+      font-weight: 950;
+      margin-bottom: 6px;
+    }
+    #pdfOverlay .s{
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    #pdfOverlay .bar{
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #eef2ff;
+      border: 1px solid var(--line);
+      margin-top: 10px;
+    }
+    #pdfOverlay .bar > div{
+      height: 100%;
+      width: 40%;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      animation: pdfbar 1.05s ease-in-out infinite;
+    }
+    @keyframes pdfbar{
+      0%{ transform: translateX(-120%); }
+      100%{ transform: translateX(320%); }
     }
   </style>
 </head>
@@ -463,6 +516,15 @@
     </div>
   </div>
 
+  <!-- PDF generation overlay -->
+  <div id="pdfOverlay" aria-hidden="true">
+    <div class="overlayBox">
+      <div class="t">PDF 생성 중…</div>
+      <div class="s">리포트를 변환하고 있어요. 잠시만 기다려 주세요.<br/>완료되면 자동으로 다운로드됩니다.</div>
+      <div class="bar"><div></div></div>
+    </div>
+  </div>
+
   <script>
     // ========= BRAND / TEXT =========
     const BRAND = {
@@ -609,20 +671,58 @@
 
     document.getElementById("btnPrint").addEventListener("click", () => window.print());
 
-    document.getElementById("btnPdf").addEventListener("click", () => {
-      render();
-      const el = document.getElementById("report");
-      const filename = `수익리포트_${todayISO()}.pdf`;
+    // PDF optimized (less lag)
+    document.getElementById("btnPdf").addEventListener("click", async () => {
+      const btn = document.getElementById("btnPdf");
+      const overlay = document.getElementById("pdfOverlay");
+      const oldText = btn.textContent;
 
-      const opt = {
-        margin: [8, 8, 8, 8], // mm
-        filename,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        pagebreak: { mode: ["css", "legacy"] }
-      };
-      html2pdf().set(opt).from(el).save();
+      try{
+        render();
+
+        btn.disabled = true;
+        btn.textContent = "PDF 생성 중…";
+        overlay.style.display = "flex";
+
+        // 캡처 영역 축소: report 전체가 아니라 reportBody만
+        const el = document.getElementById("reportBody");
+
+        // 디바이스 상황에 따라 scale 자동 조절 (속도 ↑)
+        const isMobile = window.matchMedia("(max-width: 840px)").matches;
+        const deviceMem = navigator.deviceMemory || 4;         // Chrome only; fallback 4
+        const cores = navigator.hardwareConcurrency || 4;
+
+        let scale = 2.0;
+        if (isMobile) scale = 1.4;
+        if (deviceMem <= 4 || cores <= 4) scale = Math.min(scale, 1.6);
+        if (deviceMem <= 2 || cores <= 2) scale = 1.3;
+
+        const filename = `수익리포트_${todayISO()}.pdf`;
+
+        const opt = {
+          margin: [8, 8, 8, 8], // mm
+          filename,
+          image: { type: "jpeg", quality: 0.92 }, // 품질 약간 낮춰서 속도/용량 개선
+          html2canvas: {
+            scale,
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            logging: false,
+            removeContainer: true
+          },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ["css", "legacy"] }
+        };
+
+        // overlay가 먼저 그려지도록 잠깐 yield
+        await new Promise(r => setTimeout(r, 80));
+
+        await html2pdf().set(opt).from(el).save();
+      } finally {
+        overlay.style.display = "none";
+        btn.disabled = false;
+        btn.textContent = oldText;
+      }
     });
 
     document.getElementById("btnXlsx").addEventListener("click", () => {
