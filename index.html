@@ -12,18 +12,21 @@
 
   <style>
     :root{
-      --bg:#f6f7fb;
+      /* Blue + Pink theme */
+      --bg:#f7f8ff;
       --card:#ffffff;
-      --text:#101828;
+      --text:#0b1220;
       --muted:#667085;
       --line:#e7e9ef;
-      --soft:#f2f4f7;
+      --soft:#f2f4ff;
 
       /* BRAND */
-      --brand:#111827;
-      --brand2:#334155;
-      --accent:#111827;     /* 포인트 컬러 */
-      --accentSoft:#eef2ff; /* 포인트 배경 */
+      --brand:#2563eb;     /* blue */
+      --brand2:#ec4899;    /* pink */
+      --accent:#2563eb;
+      --accent2:#ec4899;
+      --accentSoft:#eef2ff;
+
       --good:#027a48;
       --bad:#b42318;
       --warn:#b54708;
@@ -36,7 +39,10 @@
     body{
       margin:0;
       font-family: system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans KR",sans-serif;
-      background:var(--bg);
+      background:
+        radial-gradient(1200px 700px at 10% 0%, rgba(37,99,235,.12), transparent 60%),
+        radial-gradient(1000px 700px at 95% 10%, rgba(236,72,153,.12), transparent 55%),
+        linear-gradient(180deg, #f7f8ff, #ffffff 45%, #f7f8ff);
       color:var(--text);
     }
 
@@ -65,11 +71,17 @@
       font-weight:800;
       cursor:pointer;
       color:var(--text);
+      transition: transform .12s ease, filter .12s ease;
     }
     button.primary{
-      background:var(--accent);
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
       color:#fff;
-      border-color:var(--accent);
+      border: none;
+      box-shadow: 0 10px 18px rgba(37,99,235,.18), 0 10px 18px rgba(236,72,153,.14);
+    }
+    button.primary:hover{
+      filter: brightness(1.02);
+      transform: translateY(-1px);
     }
 
     .grid{display:grid; gap:14px;}
@@ -123,17 +135,25 @@
 
     .cover{
       padding:18px 18px 14px;
-      background: linear-gradient(135deg, #0b1220, #111827, #1f2937);
+      background: linear-gradient(135deg, #0b1220, rgba(37,99,235,.95), rgba(236,72,153,.90));
       color:#fff;
       position:relative;
     }
-    .coverRow{display:flex; align-items:flex-start; justify-content:space-between; gap:12px;}
+    .cover::after{
+      content:"";
+      position:absolute; inset:-40px;
+      background:
+        radial-gradient(400px 240px at 20% 20%, rgba(255,255,255,.18), transparent 60%),
+        radial-gradient(420px 260px at 85% 30%, rgba(255,255,255,.14), transparent 62%);
+      pointer-events:none;
+    }
+    .coverRow{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; position:relative; z-index:1;}
     .cover h3{margin:0; font-size:18px; letter-spacing:-.3px;}
-    .cover .meta{margin-top:6px; color: rgba(255,255,255,.78); font-size:12px; line-height:1.5;}
+    .cover .meta{margin-top:6px; color: rgba(255,255,255,.80); font-size:12px; line-height:1.5;}
     .cover .stamp{
       text-align:right;
       font-size:11px;
-      color: rgba(255,255,255,.75);
+      color: rgba(255,255,255,.78);
     }
     .cover .stamp .big{
       display:block; font-size:14px; font-weight:900; color:#fff; margin-top:4px;
@@ -156,7 +176,10 @@
       border:1px solid var(--line);
       border-radius:16px;
       padding:12px;
-      background: linear-gradient(180deg, #ffffff, #fbfbfd);
+      background:
+        radial-gradient(280px 140px at 12% 10%, rgba(37,99,235,.08), transparent 60%),
+        radial-gradient(260px 140px at 90% 20%, rgba(236,72,153,.08), transparent 62%),
+        linear-gradient(180deg, #ffffff, #fbfbfd);
     }
     .kpi .t{font-size:12px; color:var(--muted); font-weight:800;}
     .kpi .v{font-size:22px; margin-top:8px; font-weight:950; letter-spacing:-.4px;}
@@ -194,7 +217,6 @@
       vertical-align:middle;
     }
     th{
-      text-align:right;
       background:#fafbff;
       font-weight:950;
       color:#344054;
@@ -211,15 +233,36 @@
       color:#475467;
     }
 
+    /* Highlight yearly profit column (연 실수익) */
+    td.yProfit, th.yProfit{
+      background: linear-gradient(180deg, rgba(236,72,153,.10), rgba(37,99,235,.08));
+    }
+    td.yProfit{ font-weight: 950; }
+    tr.totalRow td.yProfit{
+      background: linear-gradient(180deg, rgba(236,72,153,.16), rgba(37,99,235,.12));
+    }
+
     .insight{
       margin-top:12px;
-      padding:12px;
+      padding:14px 14px;
       border-radius:16px;
-      border:1px dashed #cbd5e1;
-      background: #f8fafc;
-      color:#334155;
-      font-size:12px;
-      line-height:1.6;
+      border: 1px solid rgba(37,99,235,.28);
+      background:
+        linear-gradient(135deg, rgba(37,99,235,.14), rgba(236,72,153,.12)),
+        #ffffff;
+      color:#0b1220;
+      font-size:12.5px;
+      line-height:1.65;
+      position:relative;
+      box-shadow: 0 10px 24px rgba(37,99,235,.10), 0 10px 24px rgba(236,72,153,.08);
+      padding-left:38px;
+    }
+    .insight::before{
+      content:"💡";
+      position:absolute;
+      top:12px; left:12px;
+      font-size:16px;
+      opacity:.95;
     }
     .insight b{font-weight:950;}
 
@@ -400,7 +443,7 @@
                   <th>월 구매비용</th>
                   <th>월 실수익</th>
                   <th>연 매출</th>
-                  <th>연 실수익</th>
+                  <th class="yProfit">연 실수익</th>
                   <th>마진율</th>
                 </tr>
               </thead>
@@ -522,19 +565,22 @@
           <td>${wonK(b.monthlyCost)}</td>
           <td>${wonK(b.monthlyProfit)}</td>
           <td>${wonK(b.yearlyRevenue)}</td>
-          <td>${wonK(b.yearlyProfit)}</td>
+          <td class="yProfit">${wonK(b.yearlyProfit)}</td>
           <td>${pct(b.margin)}</td>
         </tr>
       `;
-      document.getElementById("rows").innerHTML = row("외래", op) + row("검진센터", sc) + `
-        <tr>
+      document.getElementById("rows").innerHTML =
+        row("외래", op) +
+        row("검진센터", sc) +
+        `
+        <tr class="totalRow">
           <td><b>합계</b></td>
           <td><b>${won(op.count + sc.count)}</b></td>
           <td><b>${wonK(totalMonthlyRevenue)}</b></td>
           <td><b>${wonK(op.monthlyCost + sc.monthlyCost)}</b></td>
           <td><b>${wonK(totalMonthlyProfit)}</b></td>
           <td><b>${wonK(totalYearlyRevenue)}</b></td>
-          <td><b>${wonK(totalYearlyProfit)}</b></td>
+          <td class="yProfit"><b>${wonK(totalYearlyProfit)}</b></td>
           <td><b>${pct(totalMargin)}</b></td>
         </tr>
       `;
@@ -599,8 +645,6 @@
       ];
 
       const ws = XLSX.utils.aoa_to_sheet(rows);
-
-      // formatting hint (column widths)
       ws["!cols"] = [{wch:18},{wch:22},{wch:16},{wch:16},{wch:16},{wch:16},{wch:16},{wch:10}];
 
       const wb = XLSX.utils.book_new();
