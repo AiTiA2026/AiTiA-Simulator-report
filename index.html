@@ -7,7 +7,7 @@
 
   <!-- XLSX -->
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <!-- PDF -->
+  <!-- PDF (html2pdf includes html2canvas + jsPDF) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
@@ -28,7 +28,6 @@
       --r:18px;
       --shadow: 0 12px 30px rgba(16,24,40,.06);
     }
-
     *{box-sizing:border-box}
     body{
       margin:0;
@@ -39,18 +38,10 @@
         linear-gradient(180deg, #f7f8ff, #ffffff 45%, #f7f8ff);
       color:var(--text);
     }
-
     .wrap{max-width:1100px; margin:24px auto; padding:0 16px;}
-    .topbar{
-      display:flex; gap:12px; align-items:center; justify-content:space-between;
-      margin-bottom:14px;
-    }
+    .topbar{display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:14px;}
     .brand{display:flex; gap:12px; align-items:center;}
-    .logo{
-      width:42px; height:42px; border-radius:14px;
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
-      box-shadow: var(--shadow);
-    }
+    .logo{width:42px; height:42px; border-radius:14px; background:linear-gradient(135deg,var(--brand),var(--brand2)); box-shadow:var(--shadow);}
     .brand h1{font-size:16px; margin:0; letter-spacing:-.2px;}
     .brand p{margin:2px 0 0; font-size:12px; color:var(--muted);}
 
@@ -65,39 +56,24 @@
       color:var(--text);
       transition: transform .12s ease, filter .12s ease, opacity .12s ease;
     }
-    button:disabled{
-      opacity:.65;
-      cursor:not-allowed;
-      transform:none !important;
-    }
+    button:disabled{opacity:.65; cursor:not-allowed; transform:none !important;}
     button.primary{
       background: linear-gradient(135deg, var(--brand), var(--brand2));
-      color:#fff;
-      border: none;
-      box-shadow: 0 10px 18px rgba(37,99,235,.18), 0 10px 18px rgba(236,72,153,.14);
+      color:#fff; border:none;
+      box-shadow:0 10px 18px rgba(37,99,235,.18), 0 10px 18px rgba(236,72,153,.14);
     }
-    button.primary:hover{ filter: brightness(1.02); transform: translateY(-1px); }
+    button.primary:hover{filter:brightness(1.02); transform:translateY(-1px);}
 
-    /* PDF Quality Toggle */
     .seg{
-      display:inline-flex;
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:14px;
-      overflow:hidden;
-      box-shadow: var(--shadow);
+      display:inline-flex; border:1px solid var(--line); background:#fff; border-radius:14px;
+      overflow:hidden; box-shadow:var(--shadow);
     }
-    .seg input{ display:none; }
+    .seg input{display:none;}
     .seg label{
-      padding:9px 10px;
-      font-size:12px;
-      font-weight:950;
-      color:#334155;
-      cursor:pointer;
-      user-select:none;
-      display:inline-flex; align-items:center; gap:6px;
+      padding:9px 10px; font-size:12px; font-weight:950; color:#334155;
+      cursor:pointer; user-select:none; display:inline-flex; align-items:center; gap:6px;
     }
-    .seg label + label{ border-left:1px solid var(--line); }
+    .seg label + label{border-left:1px solid var(--line);}
     .seg input:checked + label{
       background: linear-gradient(135deg, rgba(37,99,235,.12), rgba(236,72,153,.12));
       color:#0b1220;
@@ -108,63 +84,29 @@
     .grid-2{grid-template-columns: 1fr 1.25fr;}
     @media (max-width: 980px){ .grid-2{grid-template-columns:1fr;} }
 
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--r);
-      padding:16px;
-      box-shadow: var(--shadow);
-    }
+    .card{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:16px; box-shadow:var(--shadow);}
     .card h2{margin:0 0 10px; font-size:15px; letter-spacing:-.2px;}
     .sub{margin:0 0 12px; color:var(--muted); font-size:12px; line-height:1.5;}
-
-    .sectionTitle{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px; margin-bottom:10px;
-    }
-    .pill{
-      font-size:11px; font-weight:900;
-      padding:6px 10px; border-radius:999px;
-      background:var(--soft); border:1px solid var(--line);
-      color:var(--muted);
-      white-space:nowrap;
-    }
+    .sectionTitle{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px;}
+    .pill{font-size:11px; font-weight:900; padding:6px 10px; border-radius:999px; background:var(--soft); border:1px solid var(--line); color:var(--muted); white-space:nowrap;}
 
     .formGrid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
     @media (max-width: 640px){ .formGrid{grid-template-columns:1fr;} }
     label{display:block; font-size:12px; color:#344054; margin-bottom:6px; font-weight:800;}
-    input{
-      width:100%;
-      padding:11px 12px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      outline:none;
-      font-size:14px;
-      background:#fff;
-    }
+    input{width:100%; padding:11px 12px; border-radius:14px; border:1px solid var(--line); outline:none; font-size:14px; background:#fff;}
     input.hi{background:#fff7cc; border-color:#f1d470;}
     .help{font-size:11px; color:var(--muted); margin-top:6px;}
 
-    /* Report */
-    #report{
-      background:#fff;
-      border-radius:var(--r);
-      border:1px solid var(--line);
-      overflow:hidden;
-    }
-
+    #report{background:#fff; border-radius:var(--r); border:1px solid var(--line); overflow:hidden;}
     .cover{
       padding:18px 18px 14px;
       background: linear-gradient(135deg, #0b1220, rgba(37,99,235,.95), rgba(236,72,153,.90));
-      color:#fff;
-      position:relative;
+      color:#fff; position:relative;
     }
     .cover::after{
-      content:"";
-      position:absolute; inset:-40px;
-      background:
-        radial-gradient(400px 240px at 20% 20%, rgba(255,255,255,.18), transparent 60%),
-        radial-gradient(420px 260px at 85% 30%, rgba(255,255,255,.14), transparent 62%);
+      content:""; position:absolute; inset:-40px;
+      background: radial-gradient(400px 240px at 20% 20%, rgba(255,255,255,.18), transparent 60%),
+                  radial-gradient(420px 260px at 85% 30%, rgba(255,255,255,.14), transparent 62%);
       pointer-events:none;
     }
     .coverRow{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; position:relative; z-index:1;}
@@ -174,16 +116,13 @@
     .cover .stamp .big{display:block; font-size:14px; font-weight:900; color:#fff; margin-top:4px;}
     .cover .badge{
       display:inline-flex; align-items:center; gap:8px;
-      margin-top:12px;
-      padding:8px 10px;
-      background: rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.18);
-      border-radius:999px;
-      font-size:12px;
+      margin-top:12px; padding:8px 10px;
+      background: rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18);
+      border-radius:999px; font-size:12px;
     }
     .dot{width:10px; height:10px; border-radius:999px; background:#fff;}
-
     .reportBody{padding:16px;}
+
     .kpis{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
     @media (max-width: 840px){ .kpis{grid-template-columns:1fr;} }
     .kpi{
@@ -204,90 +143,43 @@
     .twoCols{display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:12px;}
     @media (max-width: 840px){ .twoCols{grid-template-columns:1fr;} }
 
-    .box{
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:12px;
-      background:#fff;
-    }
+    .box{border:1px solid var(--line); border-radius:16px; padding:12px; background:#fff;}
     .box h4{margin:0 0 8px; font-size:13px;}
-    .kv{
-      display:grid; grid-template-columns: 1fr auto; gap:8px 12px;
-      font-size:12px;
-    }
+    .kv{display:grid; grid-template-columns: 1fr auto; gap:8px 12px; font-size:12px;}
     .kv .k{color:var(--muted); font-weight:800;}
     .kv .v{font-weight:900;}
 
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:12px;
-      font-size:12px;
-    }
-    th,td{
-      padding:10px 8px;
-      border-bottom:1px solid var(--line);
-      text-align:right;
-      vertical-align:middle;
-    }
+    table{width:100%; border-collapse:collapse; margin-top:12px; font-size:12px;}
+    th,td{padding:10px 8px; border-bottom:1px solid var(--line); text-align:right; vertical-align:middle;}
     th{background:#fafbff; font-weight:950; color:#344054;}
     th:first-child, td:first-child{ text-align:left; }
-    .tag{
-      display:inline-block;
-      padding:4px 8px;
-      border-radius:999px;
-      background:var(--soft);
-      border:1px solid var(--line);
-      font-size:11px;
-      font-weight:900;
-      color:#475467;
-    }
+    .tag{display:inline-block; padding:4px 8px; border-radius:999px; background:var(--soft); border:1px solid var(--line); font-size:11px; font-weight:900; color:#475467;}
 
-    /* Highlight yearly profit column (연 실수익) */
-    td.yProfit, th.yProfit{
-      background: linear-gradient(180deg, rgba(236,72,153,.10), rgba(37,99,235,.08));
-    }
-    td.yProfit{ font-weight: 950; }
-    tr.totalRow td.yProfit{
-      background: linear-gradient(180deg, rgba(236,72,153,.16), rgba(37,99,235,.12));
-    }
+    td.yProfit, th.yProfit{background: linear-gradient(180deg, rgba(236,72,153,.10), rgba(37,99,235,.08));}
+    td.yProfit{font-weight:950;}
+    tr.totalRow td.yProfit{background: linear-gradient(180deg, rgba(236,72,153,.16), rgba(37,99,235,.12));}
 
-    /* Insight 강조 */
     .insight{
       margin-top:12px;
       padding:14px 14px 14px 38px;
       border-radius:16px;
       border: 1px solid rgba(37,99,235,.28);
-      background:
-        linear-gradient(135deg, rgba(37,99,235,.14), rgba(236,72,153,.12)),
-        #ffffff;
+      background: linear-gradient(135deg, rgba(37,99,235,.14), rgba(236,72,153,.12)), #ffffff;
       color:#0b1220;
       font-size:12.5px;
       line-height:1.65;
       position:relative;
       box-shadow: 0 10px 24px rgba(37,99,235,.10), 0 10px 24px rgba(236,72,153,.08);
     }
-    .insight::before{
-      content:"💡";
-      position:absolute;
-      top:12px; left:12px;
-      font-size:16px;
-      opacity:.95;
-    }
+    .insight::before{content:"💡"; position:absolute; top:12px; left:12px; font-size:16px; opacity:.95;}
     .insight b{font-weight:950;}
 
     .footer{
-      margin-top:14px;
-      padding-top:12px;
-      border-top:1px solid var(--line);
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      color:var(--muted);
-      font-size:11px;
+      margin-top:14px; padding-top:12px; border-top:1px solid var(--line);
+      display:flex; justify-content:space-between; gap:12px;
+      color:var(--muted); font-size:11px;
     }
 
-    /* Print/PDF hygiene */
     .noPrint{display:block;}
     @media print{
       body{background:#fff;}
@@ -302,7 +194,7 @@
 
     .a4Hint{font-size:11px; color:var(--muted); margin-top:10px;}
 
-    /* PDF overlay */
+    /* overlay */
     #pdfOverlay{
       position: fixed; inset: 0;
       background: rgba(11,18,32,.45);
@@ -313,15 +205,15 @@
       z-index: 9999;
     }
     #pdfOverlay .overlayBox{
-      width: min(420px, calc(100% - 32px));
+      width: min(460px, calc(100% - 32px));
       background: #fff;
       border: 1px solid var(--line);
       border-radius: 18px;
       padding: 14px;
       box-shadow: var(--shadow);
     }
-    #pdfOverlay .t{ font-weight: 950; margin-bottom: 6px; }
-    #pdfOverlay .s{ color: var(--muted); font-size: 12px; line-height: 1.5; }
+    #pdfOverlay .t{font-weight:950; margin-bottom:6px;}
+    #pdfOverlay .s{color:var(--muted); font-size:12px; line-height:1.5;}
     #pdfOverlay .bar{
       height: 10px; border-radius: 999px; overflow: hidden;
       background: #eef2ff; border: 1px solid var(--line); margin-top: 10px;
@@ -331,40 +223,31 @@
       background: linear-gradient(135deg, var(--brand), var(--brand2));
       animation: pdfbar 1.05s ease-in-out infinite;
     }
-    @keyframes pdfbar{
-      0%{ transform: translateX(-120%); }
-      100%{ transform: translateX(320%); }
-    }
+    @keyframes pdfbar{ 0%{transform:translateX(-120%);} 100%{transform:translateX(320%);} }
 
-    /* PDF fallback link toast */
-    #pdfToast{
-      position: fixed;
-      left: 16px;
-      bottom: 16px;
-      z-index: 10000;
-      display: none;
-      width: min(520px, calc(100% - 32px));
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      padding: 12px;
-    }
-    #pdfToast .h{font-weight:950; margin-bottom:6px;}
-    #pdfToast .p{font-size:12px; color:var(--muted); line-height:1.55;}
-    #pdfToast a{
-      display:inline-block;
+    /* debug panel */
+    #debugPanel{
       margin-top:10px;
-      font-weight:950;
-      color:#0b1220;
-      text-decoration:none;
-      padding:9px 12px;
-      border-radius:14px;
       border:1px solid var(--line);
-      background: linear-gradient(135deg, rgba(37,99,235,.10), rgba(236,72,153,.10));
+      border-radius:16px;
+      padding:10px 12px;
+      background:#fff;
+      color:#0b1220;
+      font-size:12px;
+      display:none;
     }
-    #pdfToast .x{
-      float:right; cursor:pointer; font-weight:950; color:var(--muted);
+    #debugPanel .h{font-weight:950; margin-bottom:6px;}
+    #debugPanel pre{
+      margin:0;
+      white-space:pre-wrap;
+      word-break:break-word;
+      color:#334155;
+      background:#f8fafc;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      max-height:220px;
+      overflow:auto;
     }
   </style>
 </head>
@@ -381,19 +264,21 @@
       </div>
 
       <div class="actions">
-        <!-- PDF quality toggle -->
         <div class="seg" role="group" aria-label="PDF 품질">
           <input id="qFast" name="pdfQ" type="radio" checked />
-          <label for="qFast">⚡ 빠른 PDF</label>
+          <label for="qFast">⚡ 빠른</label>
           <input id="qHigh" name="pdfQ" type="radio" />
-          <label for="qHigh">✨ 고화질 PDF</label>
+          <label for="qHigh">✨ 고화질</label>
         </div>
-        <span class="tiny">PDF 품질 선택</span>
-
         <button id="btnPdf" class="primary">PDF 다운로드</button>
         <button id="btnXlsx">엑셀 다운로드</button>
         <button id="btnPrint">인쇄</button>
       </div>
+    </div>
+
+    <div id="debugPanel" class="noPrint">
+      <div class="h">PDF 디버그 로그</div>
+      <pre id="debugText"></pre>
     </div>
 
     <div class="grid grid-2">
@@ -471,7 +356,7 @@
           </div>
         </div>
 
-        <div class="a4Hint">PDF는 보고서 영역만 A4 기준으로 저장됩니다. (입력 폼은 PDF에 포함되지 않음)</div>
+        <div class="a4Hint">PDF는 보고서 영역을 A4로 저장합니다.</div>
       </div>
 
       <!-- Report -->
@@ -481,7 +366,7 @@
             <div>
               <h3 id="coverTitle">병원 수익 시뮬레이션 리포트</h3>
               <div class="meta" id="coverOrg">OO병원 · AiTiA</div>
-              <div class="badge"><span class="dot"></span><span id="coverPeriod">월 건수 기준 · 연간 환산 포함</span></div>
+              <div class="badge"><span class="dot"></span><span>월 건수 기준 · 연간 환산 포함</span></div>
             </div>
             <div class="stamp">
               Generated
@@ -539,28 +424,17 @@
     </div>
   </div>
 
-  <!-- PDF overlay -->
+  <!-- overlay -->
   <div id="pdfOverlay" aria-hidden="true">
     <div class="overlayBox">
       <div class="t">PDF 생성 중…</div>
-      <div class="s">브라우저에서 변환을 진행 중입니다. 느릴 수 있어요.<br/>완료되면 자동으로 다운로드(또는 새 탭 미리보기) 됩니다.</div>
+      <div class="s" id="overlayMsg">엔진 준비 중…</div>
       <div class="bar"><div></div></div>
     </div>
   </div>
 
-  <!-- PDF fallback toast -->
-  <div id="pdfToast">
-    <span class="x" id="toastClose">닫기</span>
-    <div class="h">다운로드가 막혔어요</div>
-    <div class="p">
-      일부 브라우저/보안 설정에서 자동 다운로드가 제한될 수 있어요.<br/>
-      아래 버튼으로 <b>PDF를 새 탭에서 열고</b> 그 화면에서 저장해 주세요.
-    </div>
-    <a id="pdfPreviewLink" href="#" target="_blank" rel="noopener">PDF 미리보기 열기</a>
-  </div>
-
   <script>
-    // ========= BRAND / TEXT =========
+    // ===== brand =====
     const BRAND = {
       name: "SIM Revenue Report",
       subtitle: "입력값 기반 자동 리포트 · PDF/엑셀 다운로드",
@@ -571,10 +445,10 @@
     document.getElementById("footBrand").textContent = BRAND.name;
     document.getElementById("footNote").textContent = BRAND.footNote;
 
+    // ===== helpers =====
     const won = (n) => new Intl.NumberFormat('ko-KR').format(Math.round(n));
-    const wonK = (n) => new Intl.NumberFormat('ko-KR').format(Math.round(n/1000)); // 천원
+    const wonK = (n) => new Intl.NumberFormat('ko-KR').format(Math.round(n/1000));
     const pct = (n) => (isFinite(n) ? (n*100).toFixed(1) + "%" : "-");
-
     const todayISO = () => {
       const d = new Date();
       const y = d.getFullYear();
@@ -639,7 +513,6 @@
         <div class="k">월 총 건수</div><div class="v">${won(op.count + sc.count)}</div>
         <div class="k">리포트 생성일</div><div class="v">${todayISO()}</div>
       `;
-
       document.getElementById("assumptionSummary").innerHTML = `
         <div class="k">외래 단가</div><div class="v">${won(op.price)}원</div>
         <div class="k">외래 구매단가</div><div class="v">${won(op.cost)}원</div>
@@ -660,10 +533,8 @@
         </tr>
       `;
       document.getElementById("rows").innerHTML =
-        row("외래", op) +
-        row("검진센터", sc) +
-        `
-        <tr class="totalRow">
+        row("외래", op) + row("검진센터", sc) +
+        `<tr class="totalRow">
           <td><b>합계</b></td>
           <td><b>${won(op.count + sc.count)}</b></td>
           <td><b>${wonK(totalMonthlyRevenue)}</b></td>
@@ -672,56 +543,88 @@
           <td><b>${wonK(totalYearlyRevenue)}</b></td>
           <td class="yProfit"><b>${wonK(totalYearlyProfit)}</b></td>
           <td><b>${pct(totalMargin)}</b></td>
-        </tr>
-      `;
+        </tr>`;
 
       const best = (op.monthlyProfit >= sc.monthlyProfit) ? "외래" : "검진센터";
       const bestProfit = Math.max(op.monthlyProfit, sc.monthlyProfit);
       const gap = Math.abs(op.monthlyProfit - sc.monthlyProfit);
 
-      const insightLines = [
-        `월 기준으로 <b>${best}</b>이 더 큰 실수익을 만들고 있습니다. (월 실수익: <b>${won(bestProfit)}원</b>)`,
-        `외래/검진센터 월 실수익 격차는 <b>${won(gap)}원</b> 입니다.`,
-        `총 마진율은 <b>${pct(totalMargin)}</b>이며, 월 총 실수익은 <b>${won(totalMonthlyProfit)}원</b>입니다.`,
-        `연 환산 기준 총 실수익은 <b>${won(totalYearlyProfit)}원</b>입니다.`
-      ];
       document.getElementById("insight").innerHTML =
-        `<b>핵심 인사이트</b><br>` + insightLines.map(x => "• " + x).join("<br>");
+        `<b>핵심 인사이트</b><br>
+         • 월 기준으로 <b>${best}</b>이 더 큰 실수익을 만들고 있습니다. (월 실수익: <b>${won(bestProfit)}원</b>)<br>
+         • 외래/검진센터 월 실수익 격차는 <b>${won(gap)}원</b> 입니다.<br>
+         • 총 마진율은 <b>${pct(totalMargin)}</b>이며, 월 총 실수익은 <b>${won(totalMonthlyProfit)}원</b>입니다.<br>
+         • 연 환산 기준 총 실수익은 <b>${won(totalYearlyProfit)}원</b>입니다.`;
 
       return { title, org, op, sc, totalMonthlyRevenue, totalMonthlyProfit, totalYearlyRevenue, totalYearlyProfit, totalMargin };
     }
 
-    // ======= Toast helpers (fallback) =======
-    function showToast(blobUrl){
-      const toast = document.getElementById("pdfToast");
-      const link = document.getElementById("pdfPreviewLink");
-      link.href = blobUrl;
-      toast.style.display = "block";
+    // ===== debug =====
+    const debugPanel = document.getElementById("debugPanel");
+    const debugText = document.getElementById("debugText");
+    function logDebug(msg){
+      debugPanel.style.display = "block";
+      debugText.textContent += (debugText.textContent ? "\n" : "") + msg;
     }
-    function hideToast(){
-      document.getElementById("pdfToast").style.display = "none";
-    }
-    document.getElementById("toastClose").addEventListener("click", hideToast);
+    function resetDebug(){ debugText.textContent = ""; debugPanel.style.display = "none"; }
+    window.addEventListener("error", (e)=> logDebug("[window.error] " + (e.message || e.error || "unknown")));
+    window.addEventListener("unhandledrejection", (e)=> logDebug("[promise] " + (e.reason?.message || e.reason || "unknown")));
 
-    // ======= PDF quality mode =======
-    function getPdfMode(){
-      return document.getElementById("qHigh").checked ? "high" : "fast";
-    }
-
-    // ======= events =======
-    const bindIds = ["reportTitle","reportOrg","opCount","opPrice","opCost","scCount","scPrice","scCost"];
-    bindIds.forEach(id => document.getElementById(id).addEventListener("input", render));
+    // ===== events =====
+    ["reportTitle","reportOrg","opCount","opPrice","opCost","scCount","scPrice","scCost"]
+      .forEach(id => document.getElementById(id).addEventListener("input", render));
 
     document.getElementById("btnPrint").addEventListener("click", () => window.print());
 
-    // PDF: fast/high toggle + fallback preview
+    function getPdfMode(){ return document.getElementById("qHigh").checked ? "high" : "fast"; }
+
+    async function makePdf(mode){
+      // sanity check
+      if (!window.html2pdf) throw new Error("html2pdf 라이브러리가 로드되지 않았습니다. (CDN 차단/네트워크/CSP 가능)");
+      if (!window.html2pdf.Worker) throw new Error("html2pdf.Worker가 없습니다. (라이브러리 로드 불완전)");
+
+      const isMobile = window.matchMedia("(max-width: 840px)").matches;
+
+      // 요청값: fast = PC 1.4 / 모바일 1.2
+      const scale = (mode === "fast")
+        ? (isMobile ? 1.2 : 1.4)
+        : (isMobile ? 1.7 : 2.1);
+
+      const quality = (mode === "fast") ? 0.86 : 0.95;
+
+      // fast는 reportBody만(더 빠름), high는 report 전체(표지 포함)
+      const el = (mode === "fast") ? document.getElementById("reportBody") : document.getElementById("report");
+
+      const filename = `수익리포트_${todayISO()}_${mode}.pdf`;
+
+      const opt = {
+        margin: [8, 8, 8, 8],
+        filename,
+        image: { type: "jpeg", quality },
+        html2canvas: {
+          scale,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          logging: false,
+          removeContainer: true
+        },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["css", "legacy"] }
+      };
+
+      // Worker 패턴(가장 안정적)
+      const worker = new html2pdf.Worker(opt).from(el);
+      return { worker, filename };
+    }
+
     document.getElementById("btnPdf").addEventListener("click", async () => {
       const btn = document.getElementById("btnPdf");
       const overlay = document.getElementById("pdfOverlay");
+      const overlayMsg = document.getElementById("overlayMsg");
       const oldText = btn.textContent;
 
       try{
-        hideToast();
+        resetDebug();
         render();
 
         btn.disabled = true;
@@ -729,48 +632,35 @@
         overlay.style.display = "flex";
 
         const mode = getPdfMode();
-        const isMobile = window.matchMedia("(max-width: 840px)").matches;
+        overlayMsg.textContent = (mode === "fast") ? "빠른 PDF 변환 중…" : "고화질 PDF 변환 중…";
 
-        // ✅ 요청값 반영: fast 기준
-        const scaleFast = isMobile ? 1.2 : 1.4;
+        await new Promise(r => setTimeout(r, 80)); // overlay paint
 
-        // high 기준 (조금 더 선명, 느려짐)
-        const scaleHigh = isMobile ? 1.7 : 2.1;
+        logDebug("[step] worker 생성");
+        const { worker } = await makePdf(mode);
 
-        // 캡처 영역: fast는 reportBody(빠름), high는 report 전체(표지 포함)
-        const el = (mode === "high")
-          ? document.getElementById("report")
-          : document.getElementById("reportBody");
+        // 1) 먼저 save 시도
+        logDebug("[step] save() 시도");
+        await worker.save();
+        logDebug("[ok] save() 완료");
+      } catch (e) {
+        // save 실패시 bloburl로 새탭 열기(다운로드 막힘/권한 문제 포함)
+        logDebug("[error] " + (e?.message || e));
 
-        const filename = `수익리포트_${todayISO()}_${mode}.pdf`;
-
-        const opt = {
-          margin: [8, 8, 8, 8],
-          filename,
-          image: { type: "jpeg", quality: (mode === "high" ? 0.95 : 0.86) },
-          html2canvas: {
-            scale: (mode === "high" ? scaleHigh : scaleFast),
-            useCORS: true,
-            backgroundColor: "#ffffff",
-            logging: false,
-            removeContainer: true
-          },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ["css", "legacy"] }
-        };
-
-        // overlay paint
-        await new Promise(r => setTimeout(r, 80));
-
-        // 1) 기본 다운로드 시도
         try{
-          await html2pdf().set(opt).from(el).save();
-          return;
-        } catch (e) {
-          // 2) save()가 막히면: PDF blob URL 만들어서 새 탭 미리보기로 제공
-          const worker = html2pdf().set(opt).from(el).toPdf();
-          const blobUrl = await worker.outputPdf("bloburl");
-          showToast(blobUrl);
+          const mode = getPdfMode();
+          logDebug("[fallback] blob 생성 후 새 탭 열기");
+          const { worker } = await makePdf(mode);
+          const blob = await worker.outputPdf("blob"); // 안정적
+          const url = URL.createObjectURL(blob);
+          const w = window.open(url, "_blank", "noopener");
+          if (!w) {
+            logDebug("[fallback] 팝업이 차단되었습니다. 브라우저에서 팝업 허용 후 다시 시도해 주세요.");
+          } else {
+            logDebug("[ok] 새 탭 미리보기 열림 (그 화면에서 저장 가능)");
+          }
+        } catch (e2) {
+          logDebug("[fallback error] " + (e2?.message || e2));
         }
       } finally {
         overlay.style.display = "none";
@@ -790,17 +680,9 @@
         ["외래", r.op.count, r.op.monthlyRevenue, r.op.monthlyCost, r.op.monthlyProfit, r.op.yearlyRevenue, r.op.yearlyProfit, (isFinite(r.op.margin)?r.op.margin:0)],
         ["검진센터", r.sc.count, r.sc.monthlyRevenue, r.sc.monthlyCost, r.sc.monthlyProfit, r.sc.yearlyRevenue, r.sc.yearlyProfit, (isFinite(r.sc.margin)?r.sc.margin:0)],
         ["합계", r.op.count+r.sc.count, r.totalMonthlyRevenue, r.op.monthlyCost+r.sc.monthlyCost, r.totalMonthlyProfit, r.totalYearlyRevenue, r.totalYearlyProfit, (isFinite(r.totalMargin)?r.totalMargin:0)],
-        [],
-        ["가정값(원)"],
-        ["외래 단가", r.op.price],
-        ["외래 구매단가", r.op.cost],
-        ["검진 단가", r.sc.price],
-        ["검진 구매단가", r.sc.cost]
       ];
-
       const ws = XLSX.utils.aoa_to_sheet(rows);
       ws["!cols"] = [{wch:18},{wch:22},{wch:16},{wch:16},{wch:16},{wch:16},{wch:16},{wch:10}];
-
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Report");
       XLSX.writeFile(wb, `수익리포트_${todayISO()}.xlsx`, { compression:true });
